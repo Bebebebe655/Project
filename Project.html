@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Внешнеэкономические связи России в 2024 году</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .popup-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Внешнеэкономические связи России в 2024 году</h1>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-ajax/dist/leaflet.ajax.js"></script>
+<script>
+    // Инициализация карты
+    var map = L.map('map', {
+        center: [20, 0],
+        zoom: 2,
+        dragging: false, // Отключаем возможность двигать карту
+        attributionControl: false, 
+        minZoom: 2, // Минимальный зум
+        maxZoom: 2, // Максимальный зум
+        maxBounds: [[-90, -180], [90, 180]] // Ограничиваем область просмотра
+    });
+
+    // Добавление слоя карты
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        
+    }).addTo(map);
+    
+    // Функция для открытия всплывающего окна с информацией о стране
+    function onCountryClick(feature) {
+        var countryName = feature.properties.ADMIN;
+
+        if (countryName === "United States of America") {
+            var info = `
+                <div class="popup-content">
+                    <h3>Соединённые Штаты Америки</h3>
+                    <p>
+                        В 2024 году Соединённые Штаты Америки вели неоднозначную торговую политику в отношении нашей страны. 
+                        С одной стороны был увеличен экспорт удобрений, платины и турбореактивных двигателей, как и увеличение 
+                        импорта из США, в виде пищевых продуктов, реагентов и медицинских приборов. Но при этом США ввели запрет 
+                        на экспорт урана, меди и алюминия.
+                    </p>
+                </div>
+            `;
+
+            // Создание и отображение всплывающего окна
+            L.popup()
+                .setLatLng([39.8283, -98.5795]) // Координаты центра США
+                .setContent(info) // Установка содержимого
+                .openOn(map); // Открытие окна на карте
+        }
+    }
+
+    // Загрузка GeoJSON с границами стран
+    var geojsonLayer = new L.GeoJSON.AJAX("https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/master/countries.geojson", {
+        style: function(feature) {
+            return {
+                color: "#000",
+                fillColor: "#ccc",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.7
+            };
+        },
+        onEachFeature: function(feature, layer) {
+            layer.on('click', function() {
+                onCountryClick(feature); // Передаем весь объект feature
+            });
+        }
+    });
+
+    geojsonLayer.addTo(map);
+    console.log("Слой добавлен:", feature.properties.ADMIN)
+</script>
+
+</body>
+</html>
